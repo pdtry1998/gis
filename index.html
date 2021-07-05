@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Layes</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <meta name="description" content="An OL3 layerswitcher." />
+    <meta name="keywords" content="ol3, layer, layerswitcher, control,jQuery" />
+
+    <!-- jQuery -->
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script>
+
+    <!-- Openlayers -->
+    <script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=requestAnimationFrame,Element.prototype.classList,URL,Object.assign"></script>
+    <link rel="stylesheet" href="https://openlayers.org/en/latest/css/ol.css" />
+    <script type="text/javascript" src="https://openlayers.org/en/latest/build/ol.js"></script>
+
+    <!-- ol-ext -->
+    <link rel="stylesheet" href="../../dist/ol-ext.css" />
+    <script type="text/javascript" src="../../dist/ol-ext.js"></script>
+
+    <!-- Pointer events polyfill for old browsers, see https://caniuse.com/#feat=pointer -->
+    <script src="https://unpkg.com/elm-pep"></script>
+
+    <!-- bootstrap -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4"
+        crossorigin="anonymous"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-+0n0xVW2eSR5OomGNYDnhzAbDsOXxcvSN1TPprVMTNDbiYZCxYbOOl7+AMvyTG2x" crossorigin="anonymous">
+    
+        <!-- filesaver-js -->
+    <script type="text/javascript" src="https://cdn.rawgit.com/eligrey/FileSaver.js/aa9f4e0e/FileSaver.min.js"></script>
+
+
+
+    <link rel="stylesheet" href="../style.css" />
+    <style>
+        /* .hideOpacity .layerswitcher-opacity {
+            display: none;
+        } */
+
+        /* .hideOpacity .ol-layerswitcher .layerup {
+            height: 1.5em;
+        } */
+
+        /* .showPercent .layerSwitcher .ol-layerswitcher .layerswitcher-opacity-label {
+            display: block;
+        } */
+
+        .ol-header>div {
+            /*ขนาดเส้นล่าง Show/hide all*/
+            width: 100%;
+        }
+
+        .toggleVisibility {
+            padding-left: 1.6em;
+            cursor: pointer;
+            border-bottom: 2px solid rgb(13, 86, 158);
+            /*สีเส้นตรงล่าง Show/hide all*/
+            margin-bottom: 0.5em;
+        }
+
+        .toggleVisibility:before {
+            background-color: #fff;
+            /*สีตรงช่องเวลาไม่เลือก Show/hide all*/
+            border: 2px solid #369;
+            /*สีกรอบช่องเลือก Show/hide all*/
+            box-sizing: border-box;
+            content: "";
+            display: block;
+            height: 1.2em;
+            left: 0.7em;
+            margin: 0;
+            position: absolute;
+            width: 1.2em;
+        }
+
+        .toggleVisibility.show:before {
+            /*สีตรงช่องเวลาเลือก Show/hide all*/
+            background: #369;
+        }
+
+        #image {
+            background-color: #eee;
+            padding: 1em;
+            clear: both;
+            display: inline-block;
+            margin: 1em 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- first slide images -->
+    <div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" class="active"
+                aria-current="true" aria-label="Slide 1"></button>
+            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1"
+                aria-label="Slide 2"></button>
+            <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="2"
+                aria-label="Slide 3"></button>
+        </div>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="./images/Picture1.png" class="d-block w-100" alt="" height="400">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>First slide label</h5>
+                    <p>Some representative placeholder content for the first slide.</p>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img src="./images/Picture1.png" class="d-block w-100" alt="" height="400">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Second slide label</h5>
+                    <p>Some representative placeholder content for the second slide.</p>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img src="./images/Picture1.png" class="d-block w-100" alt="" height="400">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Third slide label</h5>
+                    <p>Some representative placeholder content for the third slide.</p>
+                </div>
+            </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleCaptions"
+            data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleCaptions"
+            data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Next</span>
+        </button>
+    </div>
+
+    <!-- bar button -->
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark mb-4">
+        <div class="container-fluid">
+            <img src="./images/world3.png" alt="" width="40" height="37">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse"
+                aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarCollapse">
+                <ul class="navbar-nav me-auto mb-2 mb-md-0">
+                    <li class="nav-item">
+                        <a class="nav-link active" aria-current="page" href="#">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#">เพิ่มเติม</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">แจ้งปัญหา</a>
+                    </li>
+                </ul>
+                <!-- <button type="button" class="btn btn-danger">ออกจากระบบ</button> -->
+            </div>
+        </div>
+    </nav>
+
+    <!-- <h1>ทดสอบบบ : LayerSwitcher control</h1> -->
+    <!-- Map -->
+    <br>
+    <div id="map" style="width:1000px; height:635px;"></div>
+    <div class="external layerSwitcher"><b> Layers </b></div>
+
+
+    <!-- options -->
+    <div class="options">
+        <!-- <h2>Options:</h2> -->
+        <!-- <input id="opb" type="checkbox" onchange="$('body').toggleClass('hideOpacity');" />
+        <label for="opb"> &nbsp;&nbsp;hide opacity bar </label>
+        <br />
+        <input id="percent" type="checkbox" onchange="$('body').toggleClass('showPercent');" />
+        <label for="percent"> &nbsp;&nbsp;show percent </label> -->
+       
+        <!-- <h2>Options: </h2> -->
+
+        <!-- <b>Options: </b> <br> -->
+        
+        <!-- <a id="export-pdf" class="btn" download="map.pdf" data-margin="10" target="_new" onclick="printControl.print({ imageType: 'image/jpeg', pdf:false })">
+            Export PDF
+        </a> -->
+        
+    </div>
+
+    <script type="text/javascript">
+        // Base Layers
+        var baseLayers = new ol.layer.Group({
+            title: 'Base Layers',
+            openInLayerSwitcher: true,
+            layers: [
+                new ol.layer.Tile({
+                    title: "Watercolor",
+                    baseLayer: true,
+                    visible: false,
+                    source: new ol.source.Stamen({ layer: 'watercolor' })
+                }),
+                new ol.layer.Tile({
+                    title: "Toner",
+                    baseLayer: true,
+                    visible: false,
+                    source: new ol.source.Stamen({ layer: 'toner' })
+                }),
+                new ol.layer.Tile({
+                    title: "Terrain",
+                    baseLayer: true,
+                    visible: false,
+                    source: new ol.source.Stamen({ layer: 'terrain' })
+                }),
+                new ol.layer.Tile({
+                    title: "OSM",
+                    baseLayer: true,
+                    source: new ol.source.OSM(),
+                }),        
+            ]
+        });
+
+        // Labels (on top)
+        var labels = new ol.layer.Tile({
+            title: "Labels (on top)",
+            allwaysOnTop: true,			// Stay on top of layer switcher
+            noSwitcherDelete: true,		// Prevent deleting from layer switcher
+            source: new ol.source.Stamen({ layer: 'terrain-labels' })
+        });
+
+        // layer on geoserver
+
+        // road 
+        var road = new ol.layer.Image({
+            title: "Road",
+            source: new ol.source.ImageWMS({
+                url: 'http://localhost:8081/geoserver/allnewphuket/wms',
+                params: { 'LAYERS': 'allnewphuket:roads' },
+                serverType: 'geoserver',
+            })       
+        });
+
+        // points
+        var point = new ol.layer.Image({
+            title: "Points",
+            source: new ol.source.ImageWMS({
+                url: 'http://localhost:8081/geoserver/allnewphuket/wms',
+                params: { 'LAYERS': 'allnewphuket:points' },
+                serverType: 'geoserver',
+            })
+        });
+
+        // waterway
+        var waterway = new ol.layer.Image({
+            title: "Waterway",
+            source: new ol.source.ImageWMS({
+                url: 'http://localhost:8081/geoserver/allnewphuket/wms',
+                params: { 'LAYERS': 'allnewphuket:waterways' },
+                serverType: 'geoserver',
+            })
+        });
+
+        // build phuket
+        var build = new ol.layer.Image({
+            title: "Build",
+            source: new ol.source.ImageWMS({
+                url: 'http://localhost:8081/geoserver/GeoTest/wms',
+                params: { 'LAYERS': 'GeoTest:building' },
+                serverType: 'geoserver',
+            })
+        });
+
+        // The Map and show all layer
+        var map = new ol.Map({
+            target: 'map',
+            view: new ol.View({
+                //center: [10949989.307546733, 902118.0164613248],
+                center: [10953555.215732694, 880144.7266113802],
+                zoom: 16,
+                // maxZoom: 15,
+                // minZoom: 8,
+            }),
+            layers: [baseLayers,road,point,build,waterway,labels]
+        });
+
+        // Add a layer switcher outside the map
+        var switcher = new ol.control.LayerSwitcher({
+            target: $(".layerSwitcher").get(0),
+            // displayInLayerSwitcher: function (l) { return false; },
+            show_progress: true,
+            extent: true,
+            trash: true,
+            oninfo: function (l) { alert(l.get("title")); }
+        });
+
+        // function show map all and function hide map all
+        var button = $('<div class="toggleVisibility " title="show/hide">')
+            .text("แสดง / ซ่อนทั้งหมด")
+            .click(function () {
+                var a = map.getLayers().getArray();
+                var b = !a[0].getVisible();
+                if (b) button.removeClass("show");
+                else button.addClass("show");
+                for (var i = 0; i < a.length; i++) {
+                    a[i].setVisible(b);
+                }
+            });
+        switcher.setHeader($('<div>').append(button).get(0))
+
+        map.addControl(switcher);
+        // Insert mapbox layer in layer switcher
+        function displayInLayerSwitcher(b) {
+            mapbox.set('displayInLayerSwitcher', b);
+        }     
+
+
+
+        // ฟังก์ชั้น options ตรงซ่อนปุ่มสไล กับ แสดงเปอร์เซ็นต์การสไล
+        // Get options values by options
+        // if ($("#opb").prop("checked")) $('body').addClass('hideOpacity');
+        // if ($("#percent").prop("checked")) $('body').addClass('showPercent');    
+    
+
+
+    </script>
+    <br><br><br><br><br><br><br><br><br>
+    <footer class="bd-footer py-4 mt-5 bg-dark"></footer>
+
+</body>
+
+</html>
